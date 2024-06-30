@@ -7,6 +7,7 @@ const User = require('./models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const ImageDownloader = require('image-downloader');
 
 app.listen(4000);
 app.use(cors({
@@ -15,11 +16,14 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads',express.static(__dirname+'/uploads'));
 mongoose.connect(process.env.MONGO_URL);
 //C0CwY4oB4JULUJej
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'heheeeeApashavocking'
+
+//console.log({__dirname})
 
 app.get('/test', (req,res)=> {
     res.json('test ok')
@@ -79,4 +83,15 @@ app.get('/profile', (req,res)=>{
 
 app.post('/logout', (req,res)=>{
     res.cookie('token','').json(true)
+})
+
+app.post('/uploaded-by-link',async (req,res)=>{
+    const {link} = req.body;
+    const newName = 'photo' + Date.now() + '.jpg';
+    const destination = __dirname+'/uploads/'+newName;
+    await ImageDownloader.image({
+        url: link,
+        dest: destination
+    })
+    res.json(newName)
 })
