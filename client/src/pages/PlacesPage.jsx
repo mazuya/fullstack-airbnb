@@ -28,6 +28,25 @@ const PlacesPage = () => {
     setPhotoLink("");
   }
 
+  function uploadPhoto(e) {
+    const files = e.target.files;
+    const data = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      data.append("photos", files[i]);
+    }
+
+    axios
+      .post("/upload", data, {
+        headers: { "Content-type": "multipart/form-data" },
+      })
+      .then((response) => {
+        const { data: filenames } = response;
+        setAddedPhoto((prev) => {
+          return [...prev, ...filenames];
+        });
+      });
+  }
+
   return (
     <div className="w-full items-center flex flex-col gap-3 pt-6">
       {action !== "new" && (
@@ -81,15 +100,23 @@ const PlacesPage = () => {
                 {addedPhoto.length > 0 &&
                   addedPhoto.map((link, index) => (
                     <div key={index}>
+                      <p>hey</p>
                       <img
                         src={"http://localhost:4000/uploads/" + link}
                         className="w-full rounded-md"
                       />
                     </div>
                   ))}
-                <button className="p-8 w-auto rounded-lg bg-transparent border-solid border-slate-300 border-[1px] flex items-center justify-center">
+                <label className="p-8 cursor-pointer w-auto rounded-lg bg-transparent border-solid border-slate-300 border-[1px] flex items-center justify-center">
+                  <input
+                    type="file"
+                    mulitiple="true"
+                    className="hidden"
+                    onChange={uploadPhoto}
+                  />
                   <MdOutlineFileUpload />
-                </button>
+                  <p>Upload</p>
+                </label>
               </section>
             </section>
             <section className="flex flex-col gap-1">

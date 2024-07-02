@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const ImageDownloader = require('image-downloader');
+const multer = require('multer');
+const fs = require('fs')
 
 app.listen(4000);
 app.use(cors({
@@ -94,4 +96,19 @@ app.post('/uploaded-by-link',async (req,res)=>{
         dest: destination
     })
     res.json(newName)
+})
+
+const photoMiddleware = multer({dest:'uploads'});
+app.post('/upload',photoMiddleware.array('photos',100),(req,res)=>{
+    const uploadedFiles = [];
+    for (let i=0;i<req.files.length;i++){
+        const {path,originalname} = req.files[i];
+        //original name ไฟล์ที่เราอัพโหลด ชื่อว่า Sakura-Gentle-Monster-6.webp 
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1] //แยกextention นามสกุลไฟล์ 
+        const newPath = path + '.' + ext;
+        fs.renameSync(path, newPath);
+        uploadedFiles.push(newPath.replace('uploads/',''));
+    }
+    res.json(uploadedFiles);
 })
