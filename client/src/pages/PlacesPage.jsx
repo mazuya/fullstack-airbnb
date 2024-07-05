@@ -12,10 +12,10 @@ const PlacesPage = () => {
     axios.get("/places").then(({ data }) => {
       setPlaces(data);
     });
-  });
+  }, []);
 
   return (
-    <div className="w-full items-center flex flex-col gap-3 pt-6">
+    <div className="w-full justify-center items-center flex flex-col gap-3 pt-6">
       {action !== "new" && (
         <div>
           <Link
@@ -26,7 +26,10 @@ const PlacesPage = () => {
           </Link>
         </div>
       )}
-      {action === "new" && <PlacesFormPage />}
+      <div className="w-[1000px] bg-red-400">
+        {action === "new" && <PlacesFormPage />}
+      </div>
+
       <div className="w-[80%] md:w-[70%]">
         {places.length > 0 &&
           places.map((place) => (
@@ -34,9 +37,13 @@ const PlacesPage = () => {
               to={"/account/places/" + place._id}
               className="w-full mt-2 bg-slate-100 rounded-2xl flex gap-5 p-3 border-solid border-[1px] border-slate-500"
             >
-              <div className="w-32 h-32 bg-gray-400">
+              <div className="w-56 h-56 bg-gray-400 relative">
                 {place.photos.length > 0 && (
-                  <img src={place.photos[0]} alt="" />
+                  <img
+                    className="w-full h-full overflow-hidden object-cover"
+                    src={"http://localhost:4000/uploads/" + place.photos[0]}
+                    alt=""
+                  />
                 )}
               </div>
               <section className="flex flex-col gap-2 text-start">

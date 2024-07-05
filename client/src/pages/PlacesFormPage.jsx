@@ -1,11 +1,13 @@
 import React from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { MdOutlineFileUpload } from "react-icons/md";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Perks from "../../components/Perks";
 import axios from "axios";
+import { RxCross2 } from "react-icons/rx";
 
 const PlacesFormPage = () => {
+  const { id } = useParams();
   const [title, setTitle] = useState("");
   const [address, setAddress] = useState("");
   const [addedPhoto, setAddedPhoto] = useState([]);
@@ -16,7 +18,25 @@ const PlacesFormPage = () => {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [maxGuests, setMaxGuestes] = useState(1);
-  const [redirect, setRedirect] = useState("");
+  const [redirect, setRedirect] = useState(false);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    axios.get("/places/" + id).then((response) => {
+      const { data } = response;
+      setTitle(data.title);
+      setAddress(data.address);
+      setAddedPhoto(data.photos);
+      setDescription(data.description);
+      setPerk(data.perks);
+      setExtraInfo(data.extraInfo);
+      setCheckIn(data.checkIn);
+      setCheckOut(data.checkOut);
+      setMaxGuestes(data.maxGuests);
+    });
+  }, [id]);
 
   async function addPhotoByLink(e) {
     e.preventDefault();
@@ -48,7 +68,11 @@ const PlacesFormPage = () => {
       });
   }
 
-  async function addNewPlace(e) {
+  function removePhoto(filename) {
+    setAddedPhoto((prev) => prev.filter((photo) => photo !== filename));
+  }
+
+  async function savePlace(e) {
     e.preventDefault();
     const placeData = {
       title,
@@ -62,18 +86,31 @@ const PlacesFormPage = () => {
       checkOut,
       maxGuests,
     };
-    await axios.post("/places", placeData);
-    setRedirect("/account/places");
+    if (id) {
+      //Update
+      await axios.put("/places", {
+        id,
+        ...placeData,
+      });
+      setRedirect(true);
+    } else {
+      //Add new place
+
+      await axios.post("/places", { ...placeData });
+      setRedirect(true);
+    }
+    //setRedirect(true);
   }
 
   if (redirect) {
-    return <Navigate to={redirect} />;
+    return <Navigate to="/account/places" />;
   }
+
   return (
-    <div>
+    <div className="w-full flex justify-center items-center">
       <form
-        onSubmit={addNewPlace}
-        className="w-[35rem] flex flex-col gap-3 text-start"
+        onSubmit={savePlace}
+        className="w-[70%] flex flex-col gap-3 text-start"
       >
         <section className="flex flex-col gap-1">
           <label className="font-semibold">Title</label>
@@ -109,7 +146,13 @@ const PlacesFormPage = () => {
           <section className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-2">
             {addedPhoto.length > 0 &&
               addedPhoto.map((link, index) => (
-                <div key={index} className="h-40 flex">
+                <div key={index} className="h-40 flex relative">
+                  <button
+                    onClick={() => removePhoto(link)}
+                    className="absolute left-2 top-2 text-white drop-shadow-lg "
+                  >
+                    <RxCross2 />
+                  </button>
                   <img
                     src={"http://localhost:4000/uploads/" + link}
                     className="w-full rounded-md object-cover"
