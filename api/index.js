@@ -116,7 +116,7 @@ app.post('/upload',photoMiddleware.array('photos',100),(req,res)=>{
 
 app.post('/places', (req,res)=>{
     const {token} = req.cookies;
-    const {title,address,photos,description,perks,extraInfo,checkIn,checkOut,maxGuests} = req.body;
+    const {title,address,photos,description,perks,extraInfo,checkIn,checkOut,maxGuests,price} = req.body;
     jwt.verify(token,jwtSecret,{},async (err,userData)=>{
         if (err) throw err;
         const placeDoc = await Place.create({
@@ -129,7 +129,8 @@ app.post('/places', (req,res)=>{
             extraInfo,
             checkIn,
             checkOut,
-            maxGuests
+            maxGuests,
+            price
         })
         res.json(placeDoc);
     });
@@ -163,6 +164,7 @@ app.put('/places',async (req,res)=>{
         checkIn,
         checkOut,
         maxGuests,
+        price
     } = req.body;
     jwt.verify(token,jwtSecret,{},async (err,userData) => {
         if (err) throw err;
@@ -179,6 +181,7 @@ app.put('/places',async (req,res)=>{
                 checkIn,
                 checkOut,
                 maxGuests,
+                price
             });
             placeDoc.save();
             res.json(placeDoc);

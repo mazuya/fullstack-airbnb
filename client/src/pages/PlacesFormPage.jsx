@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Perks from "../../components/Perks";
 import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
+import AccountNav from "../../components/AccountNav";
 
 const PlacesFormPage = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const PlacesFormPage = () => {
   const [checkOut, setCheckOut] = useState("");
   const [maxGuests, setMaxGuestes] = useState(1);
   const [redirect, setRedirect] = useState(false);
+  const [price, setPrice] = useState(100);
 
   useEffect(() => {
     if (!id) {
@@ -35,6 +37,7 @@ const PlacesFormPage = () => {
       setCheckIn(data.checkIn);
       setCheckOut(data.checkOut);
       setMaxGuestes(data.maxGuests);
+      setPrice(data.price);
     });
   }, [id]);
 
@@ -72,6 +75,8 @@ const PlacesFormPage = () => {
     setAddedPhoto((prev) => prev.filter((photo) => photo !== filename));
   }
 
+  //have to fix bug
+
   async function savePlace(e) {
     e.preventDefault();
     const placeData = {
@@ -85,6 +90,7 @@ const PlacesFormPage = () => {
       checkIn,
       checkOut,
       maxGuests,
+      price,
     };
     if (id) {
       //Update
@@ -107,10 +113,11 @@ const PlacesFormPage = () => {
   }
 
   return (
-    <div className="w-full flex justify-center items-center">
+    <div className="w-full justify-center items-center flex flex-col gap-3 pt-6">
+      <AccountNav subpage={"places"} />
       <form
         onSubmit={savePlace}
-        className="w-[70%] flex flex-col gap-3 text-start"
+        className="w-[70%] flex flex-col gap-3 text-start mt-5"
       >
         <section className="flex flex-col gap-1">
           <label className="font-semibold">Title</label>
@@ -139,7 +146,10 @@ const PlacesFormPage = () => {
               type="text"
               placeholder="Add using a link ...jpg"
             />
-            <button className="primary w-auto text-xs" onClick={addPhotoByLink}>
+            <button
+              className="primary w-auto text-xs p-2 rounded-md"
+              onClick={addPhotoByLink}
+            >
               Add photo
             </button>
           </div>
@@ -219,8 +229,17 @@ const PlacesFormPage = () => {
               placeholder="14:00"
             />
           </div>
+          <div>
+            <h3>Price per nights</h3>
+            <input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              type="number"
+              placeholder="100"
+            />
+          </div>
         </section>
-        <button className="primary">Save</button>
+        <button className="primary p-2 rounded-md ">Save</button>
       </form>
     </div>
   );

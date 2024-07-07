@@ -9,8 +9,8 @@ import { UserContext } from "../src/UserContext";
 const Navbar = () => {
   const { user } = useContext(UserContext);
   return (
-    <>
-      <div className="p-4 flex justify-between">
+    <div className="">
+      <div className="p-4 flex justify-between pb-6 border-b-2">
         {/* Logo */}
         <Link
           to={"/"}
@@ -48,7 +48,7 @@ const Navbar = () => {
           </Link>
         </section>
       </div>
-    </>
+    </div>
   );
 };
 
